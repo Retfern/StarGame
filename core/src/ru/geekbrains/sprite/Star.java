@@ -18,7 +18,7 @@ public class Star extends Sprite {
         float vx = Rnd.nextFloat(-0.005f, 0.005f);
         float vy = Rnd.nextFloat(-0.5f, -0.1f);
         v = new Vector2(vx, vy);
-        setHeightProportion(0.01f);
+        setHeightProportion(0.007f);
     }
 
     @Override
