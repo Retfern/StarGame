@@ -68,7 +68,7 @@ public class GameScreen extends BaseScreen {
         for (Star star : starList) {
             star.draw(batch);
         }
-        starship.draw(batch, atlas);
+        starship.draw(batch);
         batch.end();
     }
 
