@@ -61,6 +61,7 @@ public class GameScreen extends BaseScreen {
     public void render(float delta) {
         super.render(delta);
         update(delta);
+        checkCollisions();
         freeAllDestroyedSprites();
         draw();
     }
@@ -75,6 +76,10 @@ public class GameScreen extends BaseScreen {
         enemyGenerator.generate(delta);
     }
 
+    private void checkCollisions() {
+
+    }
+
     private void freeAllDestroyedSprites() {
         bulletPool.freeAllDestroyedActiveSprites();
         enemyPool.freeAllDestroyedActiveSprites();
@@ -86,7 +91,9 @@ public class GameScreen extends BaseScreen {
         for (Star star : starList) {
             star.draw(batch);
         }
-        mainShip.draw(batch);
+        if (!mainShip.isDestroyed()) {
+            mainShip.draw(batch);
+        }
         bulletPool.drawActiveSprites(batch);
         enemyPool.drawActiveSprites(batch);
         batch.end();
