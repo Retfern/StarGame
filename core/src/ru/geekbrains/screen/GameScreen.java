@@ -1,5 +1,6 @@
 package ru.geekbrains.screen;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
@@ -13,6 +14,8 @@ import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.sprite.Background;
+import ru.geekbrains.sprite.Bullet;
+import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.MainShip;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.utils.EnemyGenerator;
@@ -34,6 +37,12 @@ public class GameScreen extends BaseScreen {
     private Sound bulletSound;
 
     private EnemyGenerator enemyGenerator;
+
+    private Game game;
+
+    public GameScreen(Game game) {
+        this.game = game;
+    }
 
     @Override
     public void show() {
@@ -78,6 +87,32 @@ public class GameScreen extends BaseScreen {
 
     private void checkCollisions() {
 
+        for (Bullet bullet : bulletPool.getActiveObjects()) {
+            for (Enemy enemy : enemyPool.getActiveObjects()) {
+                if (!(enemy.isOutside(bullet.getRect())) && !(bullet.getOwner().getClass().equals(enemy.getClass()))) {
+                    System.out.println("true colision  my bullet in enemy");
+                    System.out.println("By Enemy HP before " + enemy.getHP());
+                    enemy.setHP(enemy.getHP()-mainShip.getBulletDamage());
+                    System.out.println("By Enemy HP now " + enemy.getHP());
+                    bullet.destroy();
+                    if (enemy.getHP()<=0) {enemy.destroy();}
+                }
+                if ((!mainShip.isOutside(bullet.getRect()) && !(bullet.getOwner().getClass().equals(mainShip.getClass()))) ){
+                    System.out.println("true colision bullet");
+                    System.out.println("My HP before " + mainShip.getHP());
+                    mainShip.setHP(mainShip.getHP()-enemy.getBulletDamage());
+                    System.out.println("My HP now " + mainShip.getHP());
+                    bullet.destroy();
+                    if (mainShip.getHP()<=0) {mainShip.destroy();}
+                }
+                if (!mainShip.isOutside(enemy.getRect())) {
+                    mainShip.destroy();
+                    enemy.destroy();
+                    System.out.println("true colision");
+                    game.setScreen(new GameOverScreen());
+                }
+            }
+        }
     }
 
     private void freeAllDestroyedSprites() {

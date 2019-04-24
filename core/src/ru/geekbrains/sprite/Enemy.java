@@ -13,6 +13,8 @@ public class Enemy extends Ship {
     private enum State {DESCENT, FIGHT}
     private State state;
     private Vector2 descentV;
+    int hp;
+    int bulletDamage;
 
     private MainShip mainShip;
 
@@ -38,6 +40,7 @@ public class Enemy extends Ship {
                 shoot();
             }
         }
+
         if (isOutside(worldBounds)) {
             destroy();
         }
@@ -66,5 +69,15 @@ public class Enemy extends Ship {
         v.set(descentV);
         reloadTimer = reloadInterval;
         state = State.DESCENT;
+    }
+    public void setHP (int newHP) {
+        this.hp = newHP;
+    }
+
+    public int  getHP (){
+        return hp;
+    }
+    public int getBulletDamage (){
+        return damage;
     }
 }

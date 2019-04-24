@@ -29,6 +29,7 @@ public class MainShip extends Ship {
         this.bulletV.set(0f, 0.5f);
         this.bulletHeight = 0.015f;
         this.damage = 1;
+        this.hp = 50;
         this.v0.set(0.5f, 0);
     }
 
@@ -147,5 +148,15 @@ public class MainShip extends Ship {
 
     private void stop() {
         v.setZero();
+    }
+    public void setHP (int newHP) {
+        this.hp = newHP;
+    }
+
+    public int  getHP (){
+        return hp;
+    }
+    public int getBulletDamage (){
+        return damage;
     }
 }
