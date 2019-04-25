@@ -38,8 +38,9 @@ public class Enemy extends Ship {
                 shoot();
             }
         }
-        if (isOutside(worldBounds)) {
+        if (getBottom() < worldBounds.getBottom()) {
             destroy();
+            mainShip.damage(damage);
         }
     }
 
@@ -66,5 +67,13 @@ public class Enemy extends Ship {
         v.set(descentV);
         reloadTimer = reloadInterval;
         state = State.DESCENT;
+    }
+
+    public boolean isBulletCollision(Rect bullet) {
+        return !(bullet.getRight() < getLeft()
+                || bullet.getLeft() > getRight()
+                || bullet.getBottom() > getTop()
+                || bullet.getTop() < pos.y
+                );
     }
 }
