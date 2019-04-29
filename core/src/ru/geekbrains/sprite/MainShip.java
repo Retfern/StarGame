@@ -12,6 +12,7 @@ import ru.geekbrains.pool.ExplosionPool;
 
 public class MainShip extends Ship {
 
+    private static final int HP = 10;
     private static final int INVALID_POINTER = -1;
 
     private boolean pressedRight;
@@ -33,6 +34,12 @@ public class MainShip extends Ship {
         this.damage = 1;
         this.hp = 10;
         this.v0.set(0.5f, 0);
+    }
+
+    public void reset() {
+        flushDestroy();
+        hp = HP;
+        pos.x = worldBounds.pos.x;
     }
 
     @Override

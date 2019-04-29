@@ -18,7 +18,9 @@ import ru.geekbrains.pool.ExplosionPool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Enemy;
+import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.MainShip;
+import ru.geekbrains.sprite.NewGame;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.utils.EnemyGenerator;
 
@@ -46,6 +48,9 @@ public class GameScreen extends BaseScreen {
 
     private EnemyGenerator enemyGenerator;
 
+    private GameOver gameOver;
+    private NewGame newGame;
+
     @Override
     public void show() {
         super.show();
@@ -67,6 +72,8 @@ public class GameScreen extends BaseScreen {
         mainShip = new MainShip(atlas, bulletPool, explosionPool, laserSound);
         enemyPool = new EnemyPool(bulletPool, explosionPool, bulletSound, worldBounds, mainShip);
         enemyGenerator = new EnemyGenerator(atlas, enemyPool, worldBounds);
+        gameOver = new GameOver(atlas);
+        newGame = new NewGame(atlas, this);
         state = State.PLAYING;
     }
 
@@ -156,6 +163,9 @@ public class GameScreen extends BaseScreen {
             mainShip.draw(batch);
             bulletPool.drawActiveSprites(batch);
             enemyPool.drawActiveSprites(batch);
+        } else if (state == State.GAME_OVER) {
+            gameOver.draw(batch);
+            newGame.draw(batch);
         }
         explosionPool.drawActiveSprites(batch);
         batch.end();
@@ -223,6 +233,8 @@ public class GameScreen extends BaseScreen {
     public boolean touchDown(Vector2 touch, int pointer) {
         if (state == State.PLAYING) {
             mainShip.touchDown(touch, pointer);
+        } else if (state == State.GAME_OVER) {
+            newGame.touchDown(touch, pointer);
         }
         return false;
     }
@@ -231,7 +243,19 @@ public class GameScreen extends BaseScreen {
     public boolean touchUp(Vector2 touch, int pointer) {
         if (state == State.PLAYING) {
             mainShip.touchUp(touch, pointer);
+        } else if (state == State.GAME_OVER) {
+            newGame.touchUp(touch, pointer);
         }
         return false;
+    }
+
+    public void reset() {
+        state = State.PLAYING;
+
+        mainShip.reset();
+
+        bulletPool.freeAllActiveSprites();
+        enemyPool.freeAllActiveSprites();
+        explosionPool.freeAllActiveSprites();
     }
 }
