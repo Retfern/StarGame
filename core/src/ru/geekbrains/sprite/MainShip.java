@@ -35,6 +35,12 @@ public class MainShip extends Ship {
         this.v0.set(0.5f, 0);
     }
 
+    public void reset () {
+        flushDestroy();
+        hp = 10;
+        pos.x = worldBounds.pos.x;
+    }
+
     @Override
     public void resize(Rect worldBounds) {
         super.resize(worldBounds);
