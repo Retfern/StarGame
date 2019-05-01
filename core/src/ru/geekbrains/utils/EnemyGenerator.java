@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import ru.geekbrains.math.Rect;
 import ru.geekbrains.math.Rnd;
 import ru.geekbrains.pool.EnemyPool;
+import ru.geekbrains.pool.MedicinePool;
 import ru.geekbrains.sprite.Enemy;
+import ru.geekbrains.sprite.Medicine;
 
 public class EnemyGenerator {
 
@@ -48,10 +50,12 @@ public class EnemyGenerator {
     private final TextureRegion bulletRegion;
 
     private final EnemyPool enemyPool;
+    private  final MedicinePool medicinePool;
 
     private int stage = 1;
+    private int oldStage = 2;
 
-    public EnemyGenerator(TextureAtlas atlas, EnemyPool enemyPool, Rect worldBounds) {
+    public EnemyGenerator(TextureAtlas atlas, EnemyPool enemyPool, Rect worldBounds, MedicinePool medicinePool) {
         TextureRegion enemy0 = atlas.findRegion("enemy0");
         this.enemySmallRegion = Regions.split(enemy0, 1, 2, 2);
         TextureRegion enemy1 = atlas.findRegion("enemy1");
@@ -60,11 +64,19 @@ public class EnemyGenerator {
         this.enemyBigRegion = Regions.split(enemy2, 1, 2, 2);
         this.bulletRegion = atlas.findRegion("bulletEnemy");
         this.enemyPool = enemyPool;
+        this.medicinePool = medicinePool;
         this.worldBounds = worldBounds;
     }
 
     public void generate(float delta, int frags) {
         stage = frags / 10 + 1;
+        if (oldStage==stage) {
+            oldStage++;
+            Medicine medicine = medicinePool.obtain();
+            medicine.pos.x = Rnd.nextFloat(worldBounds.getLeft() + medicine.getHalfWidth(),
+                    worldBounds.getRight() - medicine.getHalfWidth());
+            medicine.setBottom(worldBounds.getTop());
+        }
         generateTimer += delta;
         if (generateTimer >= generateInterval) {
             generateTimer = 0f;

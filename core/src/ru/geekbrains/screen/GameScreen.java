@@ -16,11 +16,13 @@ import ru.geekbrains.math.Rect;
 import ru.geekbrains.pool.BulletPool;
 import ru.geekbrains.pool.EnemyPool;
 import ru.geekbrains.pool.ExplosionPool;
+import ru.geekbrains.pool.MedicinePool;
 import ru.geekbrains.sprite.Background;
 import ru.geekbrains.sprite.Bullet;
 import ru.geekbrains.sprite.Enemy;
 import ru.geekbrains.sprite.GameOver;
 import ru.geekbrains.sprite.MainShip;
+import ru.geekbrains.sprite.Medicine;
 import ru.geekbrains.sprite.NewGame;
 import ru.geekbrains.sprite.Star;
 import ru.geekbrains.sprite.TrackingStar;
@@ -38,6 +40,9 @@ public class GameScreen extends BaseScreen {
     private State state;
 
     private Texture bg;
+    private Texture med;
+    private MedicinePool medicinePool;
+
     private Background background;
     private TextureAtlas atlas;
     private TrackingStar starList[];
@@ -76,6 +81,10 @@ public class GameScreen extends BaseScreen {
         explosionSound = Gdx.audio.newSound(Gdx.files.internal("sounds/explosion.wav"));
         bg = new Texture("textures/bg.png");
         background = new Background(new TextureRegion(bg));
+
+        med = new Texture("textures/medicine.png");
+        medicinePool = new MedicinePool(worldBounds, new TextureRegion(med));
+
         atlas = new TextureAtlas("textures/mainAtlas.tpack");
         starList = new TrackingStar[64];
         bulletPool = new BulletPool();
@@ -85,7 +94,7 @@ public class GameScreen extends BaseScreen {
             starList[i] = new TrackingStar(atlas, mainShip.getV());
         }
         enemyPool = new EnemyPool(bulletPool, explosionPool, bulletSound, worldBounds, mainShip);
-        enemyGenerator = new EnemyGenerator(atlas, enemyPool, worldBounds);
+        enemyGenerator = new EnemyGenerator(atlas, enemyPool, worldBounds, medicinePool);
         gameOver = new GameOver(atlas);
         newGame = new NewGame(atlas, this);
         font = new Font("font/font.fnt", "font/font.png");
@@ -112,6 +121,7 @@ public class GameScreen extends BaseScreen {
             enemyGenerator.generate(delta, frags);
             bulletPool.updateActiveSprites(delta);
             enemyPool.updateActiveSprites(delta);
+            medicinePool.updateActiveSprites(delta);
         }
     }
 
@@ -130,6 +140,17 @@ public class GameScreen extends BaseScreen {
                 mainShip.destroy();
                 state = State.GAME_OVER;
                 return;
+            }
+        }
+
+        for (Medicine medicine : medicinePool.getActiveObjects()){
+            if(mainShip.isDestroyed()) {
+                continue;
+            }
+            float minDist = medicine.getHalfWidth() + mainShip.getHalfWidth();
+            if (medicine.pos.dst(mainShip.pos) < minDist) {
+                medicine.destroy();
+                mainShip.setHP();
             }
         }
 
@@ -170,6 +191,7 @@ public class GameScreen extends BaseScreen {
         bulletPool.freeAllDestroyedActiveSprites();
         enemyPool.freeAllDestroyedActiveSprites();
         explosionPool.freeAllDestroyedActiveSprites();
+        medicinePool.freeAllDestroyedActiveSprites();
     }
 
     private void draw() {
@@ -182,6 +204,7 @@ public class GameScreen extends BaseScreen {
             mainShip.draw(batch);
             bulletPool.drawActiveSprites(batch);
             enemyPool.drawActiveSprites(batch);
+            medicinePool.drawActiveSprites(batch);
         } else if (state == State.GAME_OVER) {
             gameOver.draw(batch);
             newGame.draw(batch);
@@ -236,6 +259,7 @@ public class GameScreen extends BaseScreen {
         bulletPool.dispose();
         enemyPool.dispose();
         explosionPool.dispose();
+        medicinePool.dispose();
         music.dispose();
         laserSound.dispose();
         bulletSound.dispose();
